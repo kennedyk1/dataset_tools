@@ -157,7 +157,7 @@ def ConvertDataset(dataset: Dataset, dst_folder:str):
         f.write(str(JSON))
 
     for i in images:
-        shutil.copy(os.path.join(dataset.images_path,i['file_name']))
+        shutil.copy(os.path.join(dataset.images_path,i['file_name']),os.path.join(dst_folder,dataset.name,'images'))
     
 
 if __name__ == "__main__":
