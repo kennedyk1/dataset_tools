@@ -3,11 +3,16 @@ import cv2
 import json
 
 class Dataset:
-    def __init__(self, image_path:str, label_path:str):
+    def __init__(self, dataset_name:str, image_path:str, label_path:str):
+        self.name = dataset_name
+        self.images_path = image_path
+        self.labels_path = label_path
         self.info = self.Info()
         self.licenses = self.Licenses()
         self.categories = []
         data = Load_YOLO_dataset(image_path, label_path)
+        self.yolo_images = data["images"]
+        self.yolo_annotations = data["annotations"]
         self.images = []
         self.annotations = []
 
@@ -113,9 +118,9 @@ def Load_YOLO_dataset(images_path:str,labels_path:str):
     return data
 
 
-def ConvertDataset(image_path:str, label_path:str, dataset_name:str):
+def ConvertDataset(dataset: Dataset):
     try:
-        os.makedirs(dataset_name)
+        os.makedirs(dataset.name)
     except:
         pass
     #LOAD IMAGES AND ANNOTATIONS
@@ -126,4 +131,5 @@ if __name__ == "__main__":
     label_path = r'inhouse\DEEC\rgb\labels'
     dataset_name = 'inhouse_dataset'
 
-    ConvertDataset()
+    inhouse = Dataset(dataset_name, image_path, label_path)
+    ConvertDataset(inhouse)
