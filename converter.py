@@ -1,6 +1,7 @@
 import os
 import cv2
 import json
+import shutil
 
 class Dataset:
     def __init__(self, dataset_name:str, image_path:str, label_path:str):
@@ -16,7 +17,7 @@ class Dataset:
         self.images = []
         self.annotations = []
 
-    def setCategories(self,cat):
+    def setCategories(self,cat:list):
         for i in cat:
             self.categories.append(
                 {
@@ -40,7 +41,7 @@ class Dataset:
             self.url = "http://www"
 
 
-def extract_info(id,image,label):
+def extract_info(id:int,image:str,label:str):
     img = cv2.imread(image,cv2.IMREAD_UNCHANGED)
     height, width = img.shape[:2]
     bboxes = []
@@ -118,18 +119,52 @@ def Load_YOLO_dataset(images_path:str,labels_path:str):
     return data
 
 
-def ConvertDataset(dataset: Dataset):
+def ConvertDataset(dataset: Dataset, dst_folder:str):
     try:
-        os.makedirs(dataset.name)
+        os.makedirs(os.path.join(dst_folder,dataset.name,'images'))
+        os.makedirs(os.path.join(dst_folder,dataset.name,'annotations'))
     except:
         pass
     #LOAD IMAGES AND ANNOTATIONS
     data = Load_YOLO_dataset(image_path,label_path)
+    dataset.images = data['images']
+    dataset.annotations = data['annotations']
+
+    info = {
+            "description": dataset.info.description,
+            "version": dataset.info.version,
+            "year": dataset.info.year,
+            "contributor": dataset.info.contributor,
+            "date_created": dataset.info.date_created
+        }
+    
+    categories = dataset.categories
+    licenses = [{"id": 0,"name": "License 1.0","url": "http://www"}]
+    images = dataset.images
+    annotations = dataset.annotations
+
+    JSON = {
+        "info": info,
+        "categories": categories,
+        "licenses": licenses,
+        "images": images,
+        "annotations": annotations
+    }
+
+    JSON = json.dumps(JSON)
+
+    with open(os.path.join(dst_folder,dataset.name,'annotations','annotations.json'), 'w') as f:
+        f.write(str(JSON))
+
+    for i in images:
+        shutil.copy(os.path.join(dataset.images_path,i['file_name']))
+    
 
 if __name__ == "__main__":
     image_path = r'inhouse\DEEC\rgb\images'
     label_path = r'inhouse\DEEC\rgb\labels'
     dataset_name = 'inhouse_dataset'
+    destination = '.'
 
     inhouse = Dataset(dataset_name, image_path, label_path)
-    ConvertDataset(inhouse)
+    ConvertDataset(inhouse, destination)
