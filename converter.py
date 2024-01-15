@@ -163,8 +163,8 @@ def ConvertDataset(dataset: Dataset, dst_folder:str):
 if __name__ == "__main__":
     image_path = r'inhouse\DEEC\rgb\images'
     label_path = r'inhouse\DEEC\rgb\labels'
-    dataset_name = 'inhouse_dataset'
-    destination = '.'
+    dataset_name = 'RGB'
+    destination = 'new_dataset'
 
     inhouse = Dataset(dataset_name, image_path, label_path)
     ConvertDataset(inhouse, destination)
